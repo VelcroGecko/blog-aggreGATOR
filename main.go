@@ -20,16 +20,25 @@ func main() {
 		cfg: &cfg,
 	}
 
-	//set current user and update config file on disk
-	//if err := cfg.SetUser("charlie"); err != nil {
-	//	fmt.Println("error setting user", err)
-	//}
+	myCommands := commands{
+		handlers: make(map[string]func(*state, command) error),
+	}
+	myCommands.register("login", handlerLogin)
 
-	// read config again and print contents of struct to terminal
-	//updatedCfg, err := config.Read()
-	//if err != nil {
-	//	fmt.Println("error reading updated config", err)
-	//}
+	cmdLineInput := os.Args
+	if len(cmdLineInput) < 2 {
+		fmt.Println("Requires a command name")
+		os.Exit(1)
+	}
 
-	fmt.Println(s)
+	myCommand := command{
+		name: cmdLineInput[1],
+		args: cmdLineInput[2:],
+	}
+
+	err = myCommands.run(&s, myCommand)
+	if err != nil {
+		fmt.Println("error running command", err)
+		os.Exit(1)
+	}
 }
